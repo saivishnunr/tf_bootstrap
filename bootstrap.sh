@@ -18,11 +18,27 @@ sudo mkdir -p /home/adminuser/myapp
 sudo chown adminuser:adminuser /home/adminuser/myapp
 
 ############################################
+# Create static HTML file
+############################################
+echo "Creating index.html..."
+cat << 'EOF' | sudo tee /home/adminuser/myapp/index.html
+<h1>Hello from Python App on RHEL!</h1>
+<p>This page is served by SimpleHTTPRequestHandler.</p>
+EOF
+
+sudo chown adminuser:adminuser /home/adminuser/myapp/index.html
+
+############################################
 # Create Python web app
 ############################################
 echo "Creating Python app..."
 cat << 'EOF' | sudo tee /home/adminuser/myapp/app.py
 from http.server import SimpleHTTPRequestHandler, HTTPServer
+import os
+
+# Serve files from the app directory
+os.chdir("/home/adminuser/myapp")
+
 HTTPServer(("0.0.0.0", 8080), SimpleHTTPRequestHandler).serve_forever()
 EOF
 
@@ -38,6 +54,7 @@ Description=Simple Python Web App
 After=network.target
 
 [Service]
+WorkingDirectory=/home/adminuser/myapp
 ExecStart=/usr/bin/python3 /home/adminuser/myapp/app.py
 Restart=always
 User=adminuser
