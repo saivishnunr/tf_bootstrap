@@ -9,15 +9,14 @@ sudo dnf install -y python3 firewalld nginx
 sudo mkdir -p /home/adminuser/myapp
 sudo chown adminuser:adminuser /home/adminuser/myapp
 
-# Stop service if running
-echo "Stopping old service..."
+# Stop and disable service BEFORE writing new files
+echo "Stopping and disabling old service..."
 sudo systemctl stop myapp || true
+sudo systemctl disable myapp || true
 
-# Remove old app.py (critical!)
-echo "Removing old app.py..."
+# Remove old files
+echo "Removing old app.py and index.html..."
 sudo rm -f /home/adminuser/myapp/app.py
-
-# Remove old index.html
 sudo rm -f /home/adminuser/myapp/index.html
 
 echo "Creating index.html..."
@@ -57,8 +56,11 @@ WantedBy=multi-user.target
 EOF
 
 sudo systemctl daemon-reload
+
+# Re-enable and start service AFTER writing new app.py
+echo "Re-enabling and starting service..."
 sudo systemctl enable myapp
-sudo systemctl restart myapp
+sudo systemctl start myapp
 
 echo "<h1>Azure VM Connectivity Test - RHEL 8.7 (VM Extension)</h1>" | sudo tee /usr/share/nginx/html/index.html
 
