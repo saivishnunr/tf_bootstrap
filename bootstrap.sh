@@ -9,9 +9,18 @@ sudo dnf install -y python3 firewalld nginx
 sudo mkdir -p /home/adminuser/myapp
 sudo chown adminuser:adminuser /home/adminuser/myapp
 
-# Stop service if running (important!)
+# Stop service if running
+echo "Stopping old service..."
 sudo systemctl stop myapp || true
 
+# Remove old app.py (critical!)
+echo "Removing old app.py..."
+sudo rm -f /home/adminuser/myapp/app.py
+
+# Remove old index.html
+sudo rm -f /home/adminuser/myapp/index.html
+
+echo "Creating index.html..."
 cat << 'EOF' | sudo tee /home/adminuser/myapp/index.html
 <h1>Hello from Python App on RHEL!</h1>
 <p>This page is served by SimpleHTTPRequestHandler.</p>
@@ -19,6 +28,7 @@ EOF
 
 sudo chown adminuser:adminuser /home/adminuser/myapp/index.html
 
+echo "Creating NEW app.py..."
 cat << 'EOF' | sudo tee /home/adminuser/myapp/app.py
 from http.server import SimpleHTTPRequestHandler, HTTPServer
 import os
@@ -31,6 +41,7 @@ EOF
 
 sudo chown adminuser:adminuser /home/adminuser/myapp/app.py
 
+echo "Creating systemd service..."
 cat << 'EOF' | sudo tee /etc/systemd/system/myapp.service
 [Unit]
 Description=Simple Python Web App
