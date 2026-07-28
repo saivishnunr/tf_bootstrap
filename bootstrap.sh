@@ -9,6 +9,9 @@ sudo dnf install -y python3 firewalld nginx
 sudo mkdir -p /home/adminuser/myapp
 sudo chown adminuser:adminuser /home/adminuser/myapp
 
+# Stop service if running (important!)
+sudo systemctl stop myapp || true
+
 cat << 'EOF' | sudo tee /home/adminuser/myapp/index.html
 <h1>Hello from Python App on RHEL!</h1>
 <p>This page is served by SimpleHTTPRequestHandler.</p>
